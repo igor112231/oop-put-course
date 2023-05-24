@@ -41,29 +41,70 @@ class PositiveSequence : public IntegerDecorator {
 public:
     explicit PositiveSequence(unique_ptr<IntegerDecorator> intseq) : intseq_(move(intseq)) {}
     
-    vector<int> Numbers() override {
-        vector<int> vect = intseq_->Numbers();
-        
-        vect=remove_if
+    vector<int> Numbers() override 
+    {
+        vector<int> pos_vect = intseq_->Numbers();
+        for (int i = 0; i < pos_vect.size(); i++)
+        {
+            if (pos_vect[i] < 1)
+            {
+                pos_vect.erase(pos_vect.begin() + i);
+            }
+        }
+        return pos_vect;
+        //      vect=remove_if(vect.begin(), vect.end(),)
+    }
+private:
+    unique_ptr<IntegerDecorator> intseq_;
+};
+
+
+class EvenSequence : public IntegerDecorator {
+public:
+    explicit EvenSequence(unique_ptr<IntegerDecorator> intseq) : intseq_ (move(intseq)) {}
+
+    vector<int> Numbers() override
+    {
+        vector<int> even_vect = intseq_->Numbers();
+        for (int i = 0; i < even_vect.size(); i++)
+        {
+            if (even_vect[i] % 2==0)
+            {
+                even_vect.erase(even_vect.begin() + i);
+            }
+        }
+        return even_vect;
     }
 
 private:
     unique_ptr<IntegerDecorator> intseq_;
 };
 
+class SortedSequence : public IntegerDecorator {
+public:
+    explicit SortedSequence(unique_ptr<IntegerDecorator> intseq) : intseq_(move(intseq)) {}
+
+    vector<int> Numbers() override
+    {
+        vector<int> sort_vect = intseq_->Numbers();
+        sort(sort_vect.begin(), sort_vect.end());
+        return sort_vect;
+    }
+    
+private:
+    unique_ptr<IntegerDecorator> intseq_;
+};
+
 int main()
 {
-    std::cout << "Hello World!\n";
-    vector<int> vect1{-1,-2, 2,1,3,4,5,6 };
+    vector<int> vect1{-1,-2, 2,1,3,6,5,4 };
+
+    unique_ptr<IntegerSequence> intseq = make_unique<SortedSequence>(
+        make_unique<EvenSequence>(
+            make_unique<PositiveSequence>(
+                make_unique<VectorSequence>(vect1))));
+    
+    vector<int> numbers = intseq->Numbers();
+
+    cout << intseq << endl;
 }
-
-// Uruchomienie programu: Ctrl + F5 lub menu Debugowanie > Uruchom bez debugowania
-// Debugowanie programu: F5 lub menu Debugowanie > Rozpocznij debugowanie
-
-// Porady dotyczące rozpoczynania pracy:
-//   1. Użyj okna Eksploratora rozwiązań, aby dodać pliki i zarządzać nimi
-//   2. Użyj okna programu Team Explorer, aby nawiązać połączenie z kontrolą źródła
-//   3. Użyj okna Dane wyjściowe, aby sprawdzić dane wyjściowe kompilacji i inne komunikaty
-//   4. Użyj okna Lista błędów, aby zobaczyć błędy
-//   5. Wybierz pozycję Projekt > Dodaj nowy element, aby utworzyć nowe pliki kodu, lub wybierz pozycję Projekt > Dodaj istniejący element, aby dodać istniejące pliku kodu do projektu
-//   6. Aby w przyszłości ponownie otworzyć ten projekt, przejdź do pozycji Plik > Otwórz > Projekt i wybierz plik sln
